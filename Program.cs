@@ -13,6 +13,7 @@ public static class Game
     private static Color RandomColor { get => new Color((byte)random.Next(256), (byte)random.Next(256), (byte)random.Next(256)); }
 
     private static List<Ball> balls = new List<Ball>();
+    private static List<Line> lines = new List<Line>();
     private static Ball outer = new Ball();
 
     private static Stopwatch timer = new Stopwatch();
@@ -67,28 +68,40 @@ public static class Game
         if (Keyboard.IsKeyPressed(Keyboard.Key.Space)) NewBall();
         if (Keyboard.IsKeyPressed(Keyboard.Key.LShift)) DeleteBall();
 
+        //outer.Radius = 400 * (0.8f + 0.2f * (float)Math.Sin(5 * time));
+        //outer.Position = new Vector2f(Center.X * (1 + 0.1f * (float)Math.Sin(10 * time)), Center.Y);
+
+        //for (int i = 0; i < lines.Count; i++)
+        //{
+        //    lines[i].P1 = MousePosition;
+        //    lines[i].P2 = balls[i].Position;
+        //}
+
         for (int i = 0; i < balls.Count; i++)
         {
-            balls[i].Move(deltaTime);
+            balls[i].Acceleration = 1000 * Vector.Normalize(MousePosition - balls[i].Position);
 
-            OuterCollision(i);
+            balls[i].Move(deltaTime);
+            balls[i].NewTrailElement(deltaTime);
+
+            //OuterCollision(i);
             //WindowCollision(i);
         }
 
-        for (int i = 0; i < balls.Count; i++)
-        {
-            for (int j = i + 1; j < balls.Count; j++)
-            {
-                BallCollision(i, j);
-            }
-        }
+        //for (int i = 0; i < balls.Count; i++)
+        //{
+        //    for (int j = i + 1; j < balls.Count; j++)
+        //    {
+        //        BallCollision(i, j);
+        //    }
+        //}
     }
 
     private static void Render()
     {
         Window.Clear();
 
-        Window.Draw(outer);
+        //Window.Draw(outer);
 
         for (int i = 0; i < balls.Count; i++)
         {
@@ -97,6 +110,8 @@ public static class Game
                 Window.Draw(balls[i].trail[j]);
             }
         }
+
+        //for (int i = 0; i < lines.Count; i++) Window.Draw(lines[i]);
 
         for (int i = 0; i < balls.Count; i++) Window.Draw(balls[i]);
 
@@ -124,14 +139,17 @@ public static class Game
     private static void NewBall()
     {
         Ball ball = new Ball();
-        ball.Radius = 50;
+        ball.Radius = 25;
         ball.Position = MousePosition;
         ball.Acceleration = new Vector2f(0, 1000);
         ball.FillColor = RandomColor;
         ball.OutlineColor = Color.White;
         ball.OutlineThickness = 1;
+        ball.trailLength = 100;
+        ball.trailInterval = 0.01f;
 
         balls.Add(ball);
+        lines.Add(new Line { P1 = MousePosition, P2 = ball.Position, Color = ball.FillColor, Thickness = 10 });
     }
 
     private static void DeleteBall()
@@ -141,6 +159,7 @@ public static class Game
             if (Vector.Distance(MousePosition, balls[i].Position) < balls[i].Radius)
             {
                 balls.RemoveAt(i);
+                lines.RemoveAt(i);
                 i--;
             }
         }

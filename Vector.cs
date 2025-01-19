@@ -11,7 +11,7 @@ public static class Vector
 
     public static float Dot(Vector2f V1, Vector2f V2) => V1.X * V2.X + V1.Y * V2.Y;
 
-    public static Vector2f Normalize(Vector2f V) => V / Length(V);
+    public static Vector2f Normalize(Vector2f V) => V == new Vector2f() ? V : V / Length(V); 
 
     public static Vector2f Rotate(Vector2f V, float Angle, Vector2f R = new Vector2f())
     {

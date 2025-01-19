@@ -24,34 +24,45 @@ public class Ball : CircleShape
     public Vector2f Acceleration = new Vector2f();
 
     public List<Ball> trail = new List<Ball>();
-    public float trailLength = 100;
+    public float trailLength = 1;
+    public float trailInterval = 0.1f;
+    private float trailTime = 0;
 
     public void Move(float DeltaTime)
     {
-        trail.Add(new Ball { Position = Position, Radius = Radius, FillColor = FillColor });
-
         Speed += DeltaTime * Acceleration;
         Position += DeltaTime * Speed;
-
-        for (int i = 0; i < trail.Count; i++)
-        {
-            trail[i].Radius -= Radius / trailLength;
-
-            if (trail[i].Radius <= 0)
-            {
-                trail.RemoveAt(i);
-                i--;
-                continue;
-            }
-
-            float ratio = trail[i].Radius / Radius;
-            byte r = (byte)(FillColor.R * ratio);
-            byte g = (byte)(FillColor.G * ratio);
-            byte b = (byte)(FillColor.B * ratio);
-
-            trail[i].FillColor = new Color(r, g, b);
-        }
     }
+
+    public void NewTrailElement(float DeltaTime)
+    {
+        trailTime += DeltaTime;
+
+        if (trailTime < trailInterval) return;
+
+        trailTime -= trailInterval;
+
+		trail.Add(new Ball { Position = Position, Radius = Radius, FillColor = FillColor });
+
+		for (int i = 0; i < trail.Count; i++)
+		{
+			trail[i].Radius -= Radius / trailLength;
+
+			if (trail[i].Radius <= 0)
+			{
+				trail.RemoveAt(i);
+				i--;
+				continue;
+			}
+
+			float ratio = trail[i].Radius / Radius;
+			byte r = (byte)(FillColor.R * ratio);
+			byte g = (byte)(FillColor.G * ratio);
+			byte b = (byte)(FillColor.B * ratio);
+
+			trail[i].FillColor = new Color(r, g, b);
+		}
+	}
 }
 
 public class Line : Drawable
