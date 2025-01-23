@@ -139,7 +139,7 @@ public static class Game
     private static void NewBall()
     {
         Ball ball = new Ball();
-        ball.Radius = 25;
+        ball.Radius = 10;
         ball.Position = MousePosition;
         ball.Acceleration = new Vector2f(0, 1000);
         ball.FillColor = RandomColor;
